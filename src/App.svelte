@@ -26,7 +26,7 @@ import { prop_dev } from 'svelte/internal';
 	}
 
 	function dragEnd(e){
-		console.log('stop');
+		// console.log('stop');
 	}
 
 	function fullScreen(){
@@ -39,13 +39,13 @@ import { prop_dev } from 'svelte/internal';
 			bFullScreen = false;
 		}
 
-		console.log('enter fullscreen');
+		// console.log('enter fullscreen');
 	}
 
 	function breakWindow(){
 		let width = window.innerWidth;
 		let height = window.innerHeight;
-		window.open(window.location.origin, "", "width="+width+",height="+height+",fullscreen=true");
+		window.open(window.location.href, "", "width="+width+",height="+height+",fullscreen=true");
 	}
 
 	function closeWindow(){
@@ -58,7 +58,7 @@ import { prop_dev } from 'svelte/internal';
 	}
 
 	function allowDrop(e){
-		console.log(e);
+		// console.log(e);
 		e.preventDefault();
 	}
 	
@@ -74,11 +74,10 @@ import { prop_dev } from 'svelte/internal';
 	}
 
 	onMount(()=>{
-		console.log(window.opener);
 		document.addEventListener('contextmenu', (e)=>{
 			e.preventDefault();
 			let target: HTMLElement = e.target; 
-			console.log(target.parentElement.parentElement.classList)
+			// console.log(target.parentElement.parentElement.classList)
 			return false;
 		});
 	});
