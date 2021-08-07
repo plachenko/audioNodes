@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-import { prop_dev } from 'svelte/internal';
+	import Node from './nodes/node.svelte';
 
-	let objectProps = [];
-	let windowProps = [
+	let aObjectProps = [];
+	let aNodes = [];
+	let aWindowProps = [
 		{name: 'break window', method: breakWindow},
 		{name: 'fullscreen', method: fullScreen},
 		{name: 'close window', method: closeWindow}
 	];
 	let actx = new AudioContext();
 	let bFullScreen = false;
+	let bPanning = false;
 	
 	for(let prop in actx){
 		/*
@@ -18,15 +20,7 @@ import { prop_dev } from 'svelte/internal';
 			props.push(txt);
 		}
 		*/
-		objectProps.push(prop);
-	}
-
-	function dragStart(e){
-		e.preventDefault();
-	}
-
-	function dragEnd(e){
-		// console.log('stop');
+		aObjectProps.push(prop);
 	}
 
 	function fullScreen(){
@@ -38,8 +32,6 @@ import { prop_dev } from 'svelte/internal';
 			document.exitFullscreen();
 			bFullScreen = false;
 		}
-
-		// console.log('enter fullscreen');
 	}
 
 	function breakWindow(){
@@ -52,18 +44,25 @@ import { prop_dev } from 'svelte/internal';
 		window.close();
 	}
 
-	function drag(e){
-		e.dataTransfer.setDragImage(new Image(), 0, 0);
-		// e.dataTransfer.setData('node', JSON.stringify(e.target.style));
-	}
-
 	function allowDrop(e){
 		// console.log(e);
 		e.preventDefault();
 	}
 	
+	function dragging(e){
+		e.dataTransfer.setData('nodeName', e.target.innerText)
+	}
+
 	function drop(e){
-		// console.log(e);
+		let data = e.dataTransfer.getData('nodeName');
+		aNodes = [...aNodes, {
+			name: data, 
+			x: e.layerX, 
+			y: e.layerY
+		}];
+
+		// let aNodes.push();
+		// nodeArray
 		// let data = JSON.parse(e.dataTransfer.getData('node'));
 		// console.log(JSON.parse(data));
 		// data.left =  e.screenX + "px";
@@ -73,11 +72,56 @@ import { prop_dev } from 'svelte/internal';
 		e.preventDefault();
 	}
 
+	function pan(x, y){
+		let nodes = document.getElementById('innerContainer');
+		nodes.style.transform = "translate("+x+"px, "+y+"px)";
+		console.log(x,y)
+
+	}
+
+	function zoom(iScrollAmt){
+		let nodes = document.getElementById('innerContainer');
+			nodes.style.transformOrigin = nodes.offsetWidth/2 + "px "+ ((nodes.offsetHeight/2) + window.innerHeight/2) + "px";
+			nodes.style.transform = "scale("+iScrollAmt+")";
+	}
+
 	onMount(()=>{
+		let iScrollAmt = 1;
+		let xamt = 0;
+		let yamt = 0;
+
+		document.addEventListener('mousedown', (e)=>{
+			if(e.button == 1){
+				bPanning = true;
+			}
+			console.log(e.button);
+		});
+
+		document.addEventListener('mousemove', (e)=>{
+			if(bPanning){
+				xamt += e.movementX;
+				yamt += e.movementY;
+				pan(xamt, yamt);
+			}
+		});
+		document.addEventListener('mouseup', (e)=>{
+			if(bPanning){
+				bPanning = false;
+			}
+
+		});
+
+		document.addEventListener('wheel', (e)=>{
+			if(iScrollAmt > 0){
+				iScrollAmt -= (e.deltaY/1000);
+			}else{
+				iScrollAmt = .01;
+			}
+			zoom(iScrollAmt);
+		});
+
 		document.addEventListener('contextmenu', (e)=>{
 			e.preventDefault();
-			let target: HTMLElement = e.target; 
-			// console.log(target.parentElement.parentElement.classList)
 			return false;
 		});
 	});
@@ -86,34 +130,31 @@ import { prop_dev } from 'svelte/internal';
 <main id="main">
 	<div id="top">
 		<ul class="menu" id="window">
-			{#each windowProps as {name, method}, i}
-				<li on:mousedown={method} class="{(!window.opener && i == 2) ? 'hide' : ''}">{name}</li>
+			{#each aWindowProps as {name, method}, i}
+				<li class="{(!window.opener && i == 2) ? 'hide' : ''}"
+					on:mousedown={method}>
+					{name}
+				</li>
 			{/each}
 		</ul>
 	</div>
 	<div id="mid">
 		<div id="pallet">
 			<ul class="menu">
-				{#each objectProps as prop}
-					<li draggable="true">{prop}</li>
+				{#each aObjectProps as prop}
+					<li 
+						draggable="true" 
+						on:dragstart="{dragging}">
+						{prop}
+					</li>
 				{/each}
 			</ul>
 		</div>
 		<div id="container" on:dragover="{allowDrop}" on:drop="{drop}">
-			<div class="node">
-				<span class="head" draggable="true" on:dragexit="{dragEnd}" on:dragstart="{drag}">header</span>
-				<div class="sockets">
-					<ul class="input">
-						<li draggable="true" on:dragend="{dragEnd}" on:dragstart="{drag}">input</li>
-						<li>input</li>
-						<li>input</li>
-						<li>input</li>
-					</ul>
-					<ul class="output">
-						<li draggable="true">input</li>
-						<li>output</li>
-					</ul>
-				</div>
+			<div id="innerContainer">
+				{#each aNodes as {name, x, y}}
+					<Node nodeTitle={name} pos={{x, y}} />
+				{/each}
 			</div>
 		</div>
 	</div>
@@ -121,93 +162,46 @@ import { prop_dev } from 'svelte/internal';
 </main>
 
 <style>
-	#top{
-		background-color:#FFF;
-		}
-		#top .menu li{
-			float: left;
-			border-bottom: none;
-			border-left: 1px solid;
-			padding: 2px 5px;
-			}
-		#window{
-			float:right;
-			}
-	#mid{
-		min-height: 100px;
-		flex:1;
-		display: flex;
-		}
-	#bot{
-		min-height: 100px;
-		/* flex:1; */
+main {
+display: flex;
+flex: 1;
+height: 100%;
+overflow: hidden;
+flex-direction: column;
+}
+.hide{
+	display: none !important;
 	}
 
-
-	.node{
-		left: 100px;
-		top: 100px;
-		
-		min-height: 100px;
-		min-width: 200px;
-		background-color:#F0F;
-		border: 2px solid;
-		border-radius: 10px;
-		position: absolute;
-		box-sizing: border-box;
-		flex: 1;
+#top{
+	background-color:#FFF;
+	}
+	#top .menu li{
+		float: left;
+		border-bottom: none;
+		border-left: 1px solid;
+		padding: 2px 5px;
 		}
-		.sockets{
-			padding: 5px;
-			display: flex;
-			}
-		.node ul{
-			flex: 1;
-			margin: 0px;
-			padding: 0px;
-			list-style: none;
-			}
-		.sockets li{
-			position: relative;
-			padding: 5px 0px;
-			}
-			.output{
-				text-align: right;
-				}
-
-		.sockets li:hover{
-			font-weight: bold;
+	#window{
+		float:right;
 		}
-		.input li::before,
-		.output li::after{
-			content: " ";
-			width: 10px;
-			height: 10px;
-			background-color:#FFF;
-			position: absolute;
-			cursor: crosshair;
-			}
-			.input li::before{
-				left: -17px;
-				top: 12px;
-				}
-			.output li::after{
-				right: -17px;
-				top: 12px;
-				}
-		.head{
-			cursor: move;
-			background-color:#CCC;
-			padding: 5px 0px;
-			text-align: center;
-			width: 100%;
-			display:block;
-			border-radius: 10px 10px 0px 0px;
-			}
+#mid{
+	min-height: 100px;
+	flex:1;
+	display: flex;
+	}
+#bot{
+	min-height: 100px;
+	/* flex:1; */
+}
+
+
+	
 
 	#container{
 		position: relative;
 		background-color:#F00;
+		overflow: hidden;
 		flex:1;
 	}
 	#pallet{
@@ -232,27 +226,5 @@ import { prop_dev } from 'svelte/internal';
 				}
 
 
-	main {
-		display: flex;
-		flex: 1;
-		height: 100%;
-		overflow: hidden;
-		flex-direction: column;
-		}
-		.hide{
-			display: none !important;
-			}
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
 </style>
