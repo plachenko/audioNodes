@@ -5,6 +5,8 @@ import { onMount } from "svelte";
     export let nodeTitle;
     export let pos;
 
+    let node;
+
     let title = "";
 
     onMount((e)=>{
@@ -17,11 +19,21 @@ import { onMount } from "svelte";
             title = nodeTitle;
         }
 
-        for(let prop in actx[nodeTitle]){
+        // console.log(Object(actx[nodeTitle]).entries())
+
+        /*
+        for(let prop of actx[nodeTitle]){
             console.log(prop);
         }
-        // this.style.left = pos.x + "px";
-        // this.style.top = pos.y + "px";
+        */
+        let dim = {
+            w: node.offsetWidth,
+            h: node.offsetHeight
+        };
+
+        node.style.left = `${pos.x - (dim.w/2)}px`;
+        node.style.top = `${pos.y - (dim.h/2)}px`;
+        console.log(node.offsetWidth);
     })
 
     function dragStart(e){
@@ -37,12 +49,13 @@ import { onMount } from "svelte";
 	}
 
     function drag(e){
-        e.preventDefault();
+        console.log(e);
+        // e.preventDefault();
 		e.dataTransfer.setDragImage(new Image(), 0, 0);
 	}
 </script>
 
-<div class="node" style="left: {pos.x}px; top: {pos.y}px">
+<div class="node" bind:this={node}>
     
     <span class="head" 
         draggable="true" 
@@ -66,6 +79,12 @@ import { onMount } from "svelte";
             <li draggable="true" 
             on:dragend="{dragEnd}" 
             on:dragstart="{drag}">output</li>
+            <li draggable="true" 
+            on:dragend="{dragEnd}" 
+            on:dragstart="{drag}">output</li>
+            <li draggable="true" 
+            on:dragend="{dragEnd}" 
+            on:dragstart="{drag}">output</li>
         </ul>
     </div>
 </div>
@@ -84,6 +103,9 @@ import { onMount } from "svelte";
     flex: 1;
     user-select: none;
     }
+    .node:hover{
+        box-shadow: 0px 0px 4px #000;
+        }
     .head{
         cursor: move;
         background-color:#CCC;
@@ -104,18 +126,18 @@ import { onMount } from "svelte";
             display: flex;
             }
             .sockets li{
+                box-sizing: border-box;
                 position: relative;
                 padding: 5px 0px;
+			    cursor: crosshair;
                 }
                 .sockets li:hover{
-			        font-weight: bold;
+                    text-shadow: 0.5px 0px 0px #000;
 		            }
-        .input{
-            text-align: left;
-            }
-        .output{
-            text-align: right;
-            }
+                .sockets li:hover::before,
+                .sockets li:hover::after{
+                    box-shadow: 0px 2px 5px #000;
+                }
 
         .input li::before,
 		.output li::after{
@@ -124,20 +146,23 @@ import { onMount } from "svelte";
 			height: 10px;
 			background-color:#FFF;
 			position: absolute;
-			cursor: crosshair;
 			}
 
         .input li{
+            text-align: left;
             padding-left: 10px;
             margin-left: -7px;
+            float: left;
             }
             .input li::before{
 				left: -10px;
 				top: 12px;
 				}
         .output li{
+            text-align: right;
             padding-right: 10px;
             margin-right: -7px;
+            float: right;
             }
             .output li::after{
 				right: -10px;

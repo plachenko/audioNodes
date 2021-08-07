@@ -75,13 +75,13 @@
 	function pan(x, y){
 		let nodes = document.getElementById('innerContainer');
 		nodes.style.transform = "translate("+x+"px, "+y+"px)";
-		console.log(x,y)
+		// console.log(x,y)
 
 	}
 
 	function zoom(iScrollAmt){
 		let nodes = document.getElementById('innerContainer');
-			nodes.style.transformOrigin = nodes.offsetWidth/2 + "px "+ ((nodes.offsetHeight/2) + window.innerHeight/2) + "px";
+			nodes.style.transformOrigin = (nodes.offsetWidth/2) + "px "+ ((nodes.offsetHeight/2) + window.innerHeight/2) + "px";
 			nodes.style.transform = "scale("+iScrollAmt+")";
 	}
 
@@ -94,7 +94,7 @@
 			if(e.button == 1){
 				bPanning = true;
 			}
-			console.log(e.button);
+			// console.log(e.button);
 		});
 
 		document.getElementById('container').addEventListener('mousemove', (e)=>{
@@ -200,7 +200,8 @@ flex-direction: column;
 
 	#container{
 		position: relative;
-		background-color:#F00;
+		/* background-color:#F00; */
+		background-color:#999;
 		overflow: hidden;
 		flex:1;
 	}
