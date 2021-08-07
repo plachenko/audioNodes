@@ -90,28 +90,28 @@
 		let xamt = 0;
 		let yamt = 0;
 
-		document.addEventListener('mousedown', (e)=>{
+		document.getElementById('container').addEventListener('mousedown', (e)=>{
 			if(e.button == 1){
 				bPanning = true;
 			}
 			console.log(e.button);
 		});
 
-		document.addEventListener('mousemove', (e)=>{
+		document.getElementById('container').addEventListener('mousemove', (e)=>{
 			if(bPanning){
 				xamt += e.movementX;
 				yamt += e.movementY;
 				pan(xamt, yamt);
 			}
 		});
-		document.addEventListener('mouseup', (e)=>{
+		document.getElementById('container').addEventListener('mouseup', (e)=>{
 			if(bPanning){
 				bPanning = false;
 			}
 
 		});
 
-		document.addEventListener('wheel', (e)=>{
+		document.getElementById('container').addEventListener('wheel', (e)=>{
 			if(iScrollAmt > 0){
 				iScrollAmt -= (e.deltaY/1000);
 			}else{
