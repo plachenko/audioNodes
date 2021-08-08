@@ -9,9 +9,7 @@ import { onMount } from "svelte";
 
     let title = "";
 
-    onMount((e)=>{
-        let actx = new AudioContext;
-        
+    onMount(()=>{
         if(nodeTitle.includes('create')){
 			const txt = nodeTitle.slice(6, nodeTitle.length);
             title = txt;
@@ -19,13 +17,8 @@ import { onMount } from "svelte";
             title = nodeTitle;
         }
 
-        // console.log(Object(actx[nodeTitle]).entries())
+        getProps(nodeTitle);
 
-        /*
-        for(let prop of actx[nodeTitle]){
-            console.log(prop);
-        }
-        */
         let dim = {
             w: node.offsetWidth,
             h: node.offsetHeight
@@ -33,12 +26,12 @@ import { onMount } from "svelte";
 
         node.style.left = `${pos.x - (dim.w/2)}px`;
         node.style.top = `${pos.y - (dim.h/2)}px`;
-        console.log(node.offsetWidth);
     })
 
     function dragStart(e){
 		e.preventDefault();
-		console.log(e);
+        console.log('starting!',e);
+        e.dataTransfer.setData('node', true);
 		this.style.opacity = "0.4";
 	}
 
@@ -49,19 +42,33 @@ import { onMount } from "svelte";
 	}
 
     function drag(e){
-        console.log(e);
         // e.preventDefault();
+        console.log(e);
 		e.dataTransfer.setDragImage(new Image(), 0, 0);
 	}
+
+    function getProps(obj){
+        let actx = new AudioContext;
+        // console.log(Object(actx[nodeTitle]).entries())
+
+        /*
+        for(let prop of actx[nodeTitle]){
+            console.log(prop);
+        }
+        */
+    }
 </script>
 
 <div class="node" bind:this={node}>
+    <div id="nodeLines">
+
+    </div>
     
     <span class="head" 
         draggable="true" 
         on:dragend="{dragEnd}" 
-        on:dragstart="{dragStart}" 
-        on:drag="{drag}">
+        on:dragstart="{drag}" 
+        >
         { title }
     </span>
         
@@ -70,21 +77,22 @@ import { onMount } from "svelte";
             <li 
                 draggable="true" 
                 on:dragend="{dragEnd}" 
-                on:dragstart="{drag}">
-                <!-- <div style="width: 100%; height: 100%; position: absolute; top: 0px; left: 0px; color: #F0F;" /> -->
+                on:dragstart="{dragStart}"
+                on:drag="{drag}"
+                >
                 input
+                <div
             </li>
         </ul>
         <ul class="output">
-            <li draggable="true" 
-            on:dragend="{dragEnd}" 
-            on:dragstart="{drag}">output</li>
-            <li draggable="true" 
-            on:dragend="{dragEnd}" 
-            on:dragstart="{drag}">output</li>
-            <li draggable="true" 
-            on:dragend="{dragEnd}" 
-            on:dragstart="{drag}">output</li>
+            <li 
+                draggable="true" 
+                on:dragend="{dragEnd}" 
+                on:dragstart="{dragStart}"
+                on:drag="{drag}"
+                >
+                output
+            </li>
         </ul>
     </div>
 </div>

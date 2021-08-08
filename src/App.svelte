@@ -10,6 +10,7 @@
 		{name: 'close window', method: closeWindow}
 	];
 	let actx = new AudioContext();
+	let html = new Document;
 	let bFullScreen = false;
 	let bPanning = false;
 	
@@ -45,7 +46,7 @@
 	}
 
 	function allowDrop(e){
-		// console.log(e);
+		bLine = true;
 		e.preventDefault();
 	}
 	
@@ -55,27 +56,20 @@
 
 	function drop(e){
 		let data = e.dataTransfer.getData('nodeName');
-		aNodes = [...aNodes, {
-			name: data, 
-			x: e.layerX, 
-			y: e.layerY
-		}];
+		if(data){
+			aNodes = [...aNodes, {
+				name: data, 
+				x: e.layerX, 
+				y: e.layerY
+			}];
+		}
 
-		// let aNodes.push();
-		// nodeArray
-		// let data = JSON.parse(e.dataTransfer.getData('node'));
-		// console.log(JSON.parse(data));
-		// data.left =  e.screenX + "px";
-		// e.target.style.left = e.screenX + "px";
-	
-		// e.target.style.top = e.screenY + "px";
 		e.preventDefault();
 	}
 
 	function pan(x, y){
 		let nodes = document.getElementById('innerContainer');
 		nodes.style.transform = "translate("+x+"px, "+y+"px)";
-		// console.log(x,y)
 
 	}
 
@@ -162,6 +156,12 @@
 </main>
 
 <style>
+	.lineContainer{
+		width: 100px;
+		position: absolute;
+		height: 100px;
+		border: 1px solid;
+	}
 main {
 display: flex;
 flex: 1;
@@ -193,7 +193,7 @@ flex-direction: column;
 #bot{
 	min-height: 100px;
 	/* flex:1; */
-}
+	}
 
 
 	
