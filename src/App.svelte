@@ -12,9 +12,11 @@
 
 <main id="main">
 	<Panel />
+	<!-- <Panel /> -->
 </main>
 
 <style>
+
 main {
 	flex-direction: row;
 	display: flex;
@@ -22,4 +24,5 @@ main {
 	height: 100%;
 	overflow: hidden;
 	}
+
 </style>

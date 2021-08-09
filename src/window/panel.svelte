@@ -12,16 +12,6 @@
 	let aObjectProps = [];
 	let bPanning = false;
 
-    function fullScreen(){
-		let elem = document.querySelector('main');
-		if(!bFullScreen){
-			elem.requestFullscreen();
-			bFullScreen = true;
-		}else {
-			document.exitFullscreen();
-			bFullScreen = false;
-		}
-	}
 
 	for(let prop in AudioContext.prototype){
 		aObjectProps.push(prop);
@@ -67,9 +57,7 @@
 
 	});
 	
-	function allowDrop(e){
-		e.preventDefault();
-	}
+
 		
 	function pan(x, y){
 		let nodes = document.getElementById('innerContainer');
@@ -82,6 +70,7 @@
 			nodes.style.transform = "scale("+iScrollAmt+")";
 	}
 
+/* --- Drag and Drop functionality --- */
 	function drop(e){
 		console.log(e);
 		let data = e.dataTransfer.getData('nodeName');
@@ -96,6 +85,23 @@
 		e.preventDefault();
 	}
 
+	function allowDrop(e){
+		e.preventDefault();
+	}
+/* --- */
+
+/* --- Window methods ---*/
+	function fullScreen(){
+		let elem = document.querySelector('main');
+		if(!bFullScreen){
+			elem.requestFullscreen();
+			bFullScreen = true;
+		}else {
+			document.exitFullscreen();
+			bFullScreen = false;
+		}
+	}
+
 	function breakWindow(){
 		let width = window.innerWidth;
 		let height = window.innerHeight;
@@ -105,6 +111,8 @@
 	function closeWindow(){
 		window.close();
 	}
+/* --- */
+
 </script>
 
 <div class="panel">
@@ -132,7 +140,7 @@
 .panel{
 	flex: 1;
 	flex-direction: column;
-	
+
 }
 
 .container{
