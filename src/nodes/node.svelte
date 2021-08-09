@@ -60,9 +60,7 @@ import { onMount } from "svelte";
 </script>
 
 <div class="node" bind:this={node}>
-    <div id="nodeLines">
 
-    </div>
     
     <span class="head" 
         draggable="true" 
@@ -81,23 +79,35 @@ import { onMount } from "svelte";
                 on:drag="{drag}"
                 >
                 input
-                <div
             </li>
         </ul>
         <ul class="output">
-            <li 
-                draggable="true" 
-                on:dragend="{dragEnd}" 
-                on:dragstart="{dragStart}"
-                on:drag="{drag}"
-                >
-                output
-            </li>
+            {#each Array(3) as _}
+                <li 
+                    draggable="true" 
+                    on:dragend="{dragEnd}" 
+                    on:dragstart="{dragStart}"
+                    on:drag="{drag}"
+                    >
+                    output
+                    <div class="nodeLines">
+
+                    </div>
+                </li>
+            {/each}
         </ul>
     </div>
 </div>
 
 <style>
+    .nodeLines{
+		width: 100px;
+		position: absolute;
+        right:-100px;
+        top:50%;
+		border-bottom: 2px solid;
+        border-right: 2px solid;
+	    }
 .node{
     left: 100px;
     top: 100px;

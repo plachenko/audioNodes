@@ -1,52 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Node from './nodes/node.svelte';
+	import Panel from './window/panel.svelte';
 
 	let aObjectProps = [];
 	let aNodes = [];
-	let aWindowProps = [
-		{name: 'break window', method: breakWindow},
-		{name: 'fullscreen', method: fullScreen},
-		{name: 'close window', method: closeWindow}
-	];
+
 	let actx = new AudioContext();
-	let html = new Document;
-	let bFullScreen = false;
 	let bPanning = false;
 	
 	for(let prop in actx){
-		/*
-		if(prop.includes('create')){
-			const txt = prop.slice(6, prop.length);
-			props.push(txt);
-		}
-		*/
 		aObjectProps.push(prop);
 	}
 
-	function fullScreen(){
-		let elem = document.querySelector('main');
-		if(!bFullScreen){
-			elem.requestFullscreen();
-			bFullScreen = true;
-		}else {
-			document.exitFullscreen();
-			bFullScreen = false;
-		}
-	}
-
-	function breakWindow(){
-		let width = window.innerWidth;
-		let height = window.innerHeight;
-		window.open(window.location.href, "", "width="+width+",height="+height+",fullscreen=true");
-	}
-
-	function closeWindow(){
-		window.close();
-	}
-
 	function allowDrop(e){
-		bLine = true;
 		e.preventDefault();
 	}
 	
@@ -55,6 +22,7 @@
 	}
 
 	function drop(e){
+		console.log(e);
 		let data = e.dataTransfer.getData('nodeName');
 		if(data){
 			aNodes = [...aNodes, {
@@ -69,8 +37,7 @@
 
 	function pan(x, y){
 		let nodes = document.getElementById('innerContainer');
-		nodes.style.transform = "translate("+x+"px, "+y+"px)";
-
+			nodes.style.transform = "translate("+x+"px, "+y+"px)";
 	}
 
 	function zoom(iScrollAmt){
@@ -85,10 +52,12 @@
 		let yamt = 0;
 
 		document.getElementById('container').addEventListener('mousedown', (e)=>{
+			if(e.button == 0){
+				console.log('test')
+			}
 			if(e.button == 1){
 				bPanning = true;
 			}
-			// console.log(e.button);
 		});
 
 		document.getElementById('container').addEventListener('mousemove', (e)=>{
@@ -122,110 +91,31 @@
 </script>
 
 <main id="main">
-	<div id="top">
-		<ul class="menu" id="window">
-			{#each aWindowProps as {name, method}, i}
-				<li class="{(!window.opener && i == 2) ? 'hide' : ''}"
-					on:mousedown={method}>
-					{name}
-				</li>
-			{/each}
-		</ul>
-	</div>
-	<div id="mid">
-		<div id="pallet">
-			<ul class="menu">
-				{#each aObjectProps as prop}
-					<li 
-						draggable="true" 
-						on:dragstart="{dragging}">
-						{prop}
-					</li>
-				{/each}
-			</ul>
-		</div>
-		<div id="container" on:dragover="{allowDrop}" on:drop="{drop}">
-			<div id="innerContainer">
-				{#each aNodes as {name, x, y}}
-					<Node nodeTitle={name} pos={{x, y}} />
-				{/each}
-			</div>
-		</div>
-	</div>
-	<div id="bot"></div>
+	<Panel />
 </main>
 
 <style>
-	.lineContainer{
-		width: 100px;
-		position: absolute;
-		height: 100px;
-		border: 1px solid;
-	}
 main {
-display: flex;
-flex: 1;
-height: 100%;
-overflow: hidden;
-flex-direction: column;
-}
-.hide{
-	display: none !important;
-	}
-
-#top{
-	background-color:#FFF;
-	}
-	#top .menu li{
-		float: left;
-		border-bottom: none;
-		border-left: 1px solid;
-		padding: 2px 5px;
-		}
-	#window{
-		float:right;
-		}
-#mid{
-	min-height: 100px;
-	flex:1;
 	display: flex;
+	flex: 1;
+	height: 100%;
+	overflow: hidden;
+	flex-direction: column;
 	}
-#bot{
-	min-height: 100px;
-	/* flex:1; */
-	}
-
-
+	.hide{
+		display: none !important;
+		}
 	
-
 	#container{
 		position: relative;
 		/* background-color:#F00; */
 		background-color:#999;
 		overflow: hidden;
 		flex:1;
-	}
+		}
 	#pallet{
 		background-color:#CCC;
 		overflow-y: scroll;
-	}
-
-	.menu{
-		user-select: none;
-		margin: 0px;
-		padding: 0px;
-		list-style: none;
 		}
-		.menu li{
-			border-bottom: 1px solid;
-			display: block;
-			padding: 15px;
-			cursor: pointer;
-			}
-			.menu li:hover{
-				background-color:#FF0;
-				}
-
-
 
 </style>
