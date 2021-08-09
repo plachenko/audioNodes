@@ -1,6 +1,6 @@
 <script lang="ts">
-import { onMount } from "svelte";
-
+    import { onMount } from "svelte";
+    import Menu from '../window/menu.svelte';
 
     export let nodeTitle;
     export let pos;
@@ -48,9 +48,9 @@ import { onMount } from "svelte";
 	}
 
     function getProps(obj){
-        let actx = new AudioContext;
         // console.log(Object(actx[nodeTitle]).entries())
 
+        // let 
         /*
         for(let prop of actx[nodeTitle]){
             console.log(prop);
@@ -60,8 +60,6 @@ import { onMount } from "svelte";
 </script>
 
 <div class="node" bind:this={node}>
-
-    
     <span class="head" 
         draggable="true" 
         on:dragend="{dragEnd}" 

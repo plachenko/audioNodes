@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { onMount }  from 'svelte';
+	import Menu from './menu.svelte';
+	import Node from '../nodes/node.svelte';
 	let aWindowProps = [
 		{name: 'break window', method: breakWindow},
 		{name: 'fullscreen', method: fullScreen},
 		{name: 'close window', method: closeWindow}
 	];
 	let bFullScreen = false;
+	let aNodes = [];
+	let aObjectProps = [];
+	let bPanning = false;
+
     function fullScreen(){
 		let elem = document.querySelector('main');
 		if(!bFullScreen){
@@ -14,6 +21,79 @@
 			document.exitFullscreen();
 			bFullScreen = false;
 		}
+	}
+
+	for(let prop in AudioContext.prototype){
+		aObjectProps.push(prop);
+	}
+
+	onMount(()=>{
+		let iScrollAmt = 1;
+		let xamt = 0;
+		let yamt = 0;
+
+		/*
+		document.getElementById('container').addEventListener('mousedown', (e)=>{
+			if(e.button == 0){
+				console.log('test')
+			}
+			if(e.button == 1){
+				bPanning = true;
+			}
+		});
+
+		document.getElementById('container').addEventListener('mousemove', (e)=>{
+			if(bPanning){
+				xamt += e.movementX;
+				yamt += e.movementY;
+				pan(xamt, yamt);
+			}
+		});
+		document.getElementById('container').addEventListener('mouseup', (e)=>{
+			if(bPanning){
+				bPanning = false;
+			}
+		});
+
+		document.getElementById('container').addEventListener('wheel', (e)=>{
+			if(iScrollAmt > 0){
+				iScrollAmt -= (e.deltaY/1000);
+			}else{
+				iScrollAmt = .01;
+			}
+			zoom(iScrollAmt);
+		});
+		*/
+
+	});
+	
+	function allowDrop(e){
+		e.preventDefault();
+	}
+		
+	function pan(x, y){
+		let nodes = document.getElementById('innerContainer');
+			nodes.style.transform = "translate("+x+"px, "+y+"px)";
+	}
+
+	function zoom(iScrollAmt){
+		let nodes = document.getElementById('innerContainer');
+			nodes.style.transformOrigin = (nodes.offsetWidth/2) + "px "+ ((nodes.offsetHeight/2) + window.innerHeight/2) + "px";
+			nodes.style.transform = "scale("+iScrollAmt+")";
+	}
+
+	function drop(e){
+		console.log(e);
+		let data = e.dataTransfer.getData('nodeName');
+		if(data){
+			aNodes = [...aNodes, {
+				name: data, 
+				x: e.layerX, 
+				y: e.layerY
+			}];
+		}
+
+		e.preventDefault();
 	}
 
 	function breakWindow(){
@@ -27,66 +107,57 @@
 	}
 </script>
 
-<div>
-    <div id="top">
-		<ul class="menu" id="window">
-			{#each aWindowProps as {name, method}, i}
-				<li class="{(!window.opener && i == 2) ? 'hide' : ''}"
-					on:mousedown={method}>
-					{name}
-				</li>
-			{/each}
-		</ul>
+<div class="panel">
+    <div class="top">
+		<Menu sType='window' aProps={aWindowProps} />
 	</div>
-	<div id="mid">
-		<div id="pallet">
-			<ul class="menu">
-				{#each aObjectProps as prop}
-					<li 
-						draggable="true" 
-						on:dragstart="{dragging}">
-						{prop}
-					</li>
-				{/each}
-			</ul>
-		</div>
+	<div class="mid">
+		<Menu sType='pallet' aProps={aObjectProps} />
         
-		<div id="container" on:dragover="{allowDrop}" on:drop="{drop}">
-			<div id="innerContainer">
+		<div class="container" on:dragover="{allowDrop}" on:drop="{drop}">
+			<div class="innerContainer">
 				{#each aNodes as {name, x, y}}
 					<Node nodeTitle={name} pos={{x, y}} />
 				{/each}
 			</div>
 		</div>
 	</div>
-	<div id="bot">
+	<div class="bot">
 		<div></div>
 	</div>
+
 </div>
 
 <style>
-#top{
-	background-color:#FFF;
-	}
-	#top .menu li{
-		float: left;
-		border-bottom: none;
-		border-left: 1px solid;
-		padding: 2px 5px;
-		}
-	#window{
-		float:right;
-		}
+.panel{
+	flex: 1;
+	flex-direction: column;
+	
+}
 
-#mid{
-	min-height: 100px;
+.container{
+	position: relative;
+	background-color:#999;
+	overflow: hidden;
 	flex:1;
-	display: flex;
 	}
 
-#bot{
-	min-height: 100px;
-	/* flex:1; */
+	.top, 
+	.mid, 
+	.bot {
+		flex: 1;
+		display: flex;
+		background-color:#FFF;
+		min-height: 30px;
+		}
+
+	.top{
+		border-bottom: 1px solid;
+		place-content: flex-end;
 	}
+
+	.mid{
+		height: 100%;
+		}
 
 </style>
