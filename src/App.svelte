@@ -8,11 +8,22 @@
 			return false;
 		});
 	});
+
+	/* -- prevent default drag and drop functionality -- */
+	/* We want to parse drag and drop based on content info */
+	function drop(e){
+		e.preventDefault();
+	}
+    
+    function dragger(e){
+		e.preventDefault();
+    }
+	/* --- */
+
 </script>
 
-<main id="main">
+<main id="main" on:drop="{drop}" on:dragover="{dragger}">
 	<Panel />
-	<!-- <Panel /> -->
 </main>
 
 <style>

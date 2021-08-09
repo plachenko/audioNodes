@@ -8,7 +8,10 @@
 		{name: 'close window', method: closeWindow}
 	];
 	let bFullScreen = false;
-	let aNodes = [];
+	let aNodes = [
+		{name: 'createMediaElementSource'},
+		{name: 'createMediaElementSource', x: 600, y: 300},
+	];
 	let aObjectProps = [];
 	let bPanning = false;
 
@@ -140,7 +143,12 @@
 .panel{
 	flex: 1;
 	flex-direction: column;
-
+	overflow: hidden;
+}
+.panel:not(:last-child){
+	border-right: 2px solid;
+	/* width: 100%; */
+	/* resize: horizontal; */
 }
 
 .container{
@@ -165,7 +173,7 @@
 	}
 
 	.mid{
-		height: 100%;
+		height: calc(100% - 32px);
 		}
 
 </style>

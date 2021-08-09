@@ -40,6 +40,8 @@
 .pallet{
     background-color:#CCC;
     overflow-y: scroll;
+    resize: horizontal;
+    height: 100%;
     }
 
 .menu{

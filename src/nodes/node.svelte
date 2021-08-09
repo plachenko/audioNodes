@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import Menu from '../window/menu.svelte';
 
     export let nodeTitle;
     export let pos;
@@ -106,6 +105,16 @@
 		border-bottom: 2px solid;
         border-right: 2px solid;
 	    }
+    .head{
+        cursor: move;
+        background-color:#CCC;
+        padding: 5px 0px;
+        text-align: center;
+        width: 100%;
+        display:block;
+        border-radius: 10px 10px 0px 0px;
+        }
+
 .node{
     left: 100px;
     top: 100px;
@@ -122,21 +131,14 @@
     .node:hover{
         box-shadow: 0px 0px 4px #000;
         }
-    .head{
-        cursor: move;
-        background-color:#CCC;
-        padding: 5px 0px;
-        text-align: center;
-        width: 100%;
-        display:block;
-        border-radius: 10px 10px 0px 0px;
-        }
+
     .node ul{
         flex: 1;
         margin: 0px;
         padding: 0px;
         list-style: none;
         }
+
         .sockets{
             padding: 5px;
             display: flex;
@@ -153,7 +155,7 @@
                 .sockets li:hover::before,
                 .sockets li:hover::after{
                     box-shadow: 0px 2px 5px #000;
-                }
+                    }
 
         .input li::before,
 		.output li::after{
@@ -174,6 +176,7 @@
 				left: -10px;
 				top: 12px;
 				}
+
         .output li{
             text-align: right;
             padding-right: 10px;
@@ -184,6 +187,4 @@
 				right: -10px;
 				top: 12px;
 				}
-			
-
 </style>
