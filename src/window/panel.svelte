@@ -4,16 +4,22 @@
 	import Node from '../nodes/node.svelte';
 	let aWindowProps = [
 		{name: 'break window', method: breakWindow},
-		{name: 'fullscreen', method: fullScreen},
+		// {name: 'fullscreen', method: fullScreen},
 		{name: 'close window', method: closeWindow}
 	];
 	let bFullScreen = false;
 	let aNodes = [
-		{name: 'createMediaElementSource'},
-		{name: 'createMediaElementSource', x: 600, y: 300},
+		{name: 'createMediaElementSource', x: 200, y: 200},
+		// {name: 'createMediaElementSource', x: 600, y: 300},
 	];
 	let aObjectProps = [];
 	let bPanning = false;
+
+	let elem;
+	let elemStartPos = {
+		x: 0,
+		y: 0
+	};
 
 
 	for(let prop in AudioContext.prototype){
@@ -73,9 +79,12 @@
 			nodes.style.transform = "scale("+iScrollAmt+")";
 	}
 
-/* --- Drag and Drop functionality --- */
+	/* --- Drag and Drop functionality --- */
 	function drop(e){
-		console.log(e);
+		// console.log('dropping', e.dataTransfer.getData('node'));
+		// let el = JSON.parse(e.dataTransfer.getData('node'));
+		// console.log(el);
+
 		let data = e.dataTransfer.getData('nodeName');
 		if(data){
 			aNodes = [...aNodes, {
@@ -85,15 +94,39 @@
 			}];
 		}
 
+		// console.log(elem);
+		// elem.style.left = `${e.clientX}px`;
+		// elem.style.top = `${e.clientY}px`;
+		// console.log(elem.offsetWidth);
+		elem = null;
+
 		e.preventDefault();
 	}
 
 	function allowDrop(e){
+		// console.log(window.getComputedStyle(elem).left)
+		// console.log(elemStartPos);
+
+		// let left = e.clientX;
+		let left = e.x;
+			left -= 298;
+			// left -= 50;
+		let top = e.clientY;
+			// top -= - 53;
+			top -= 50;
+
+		if(elem){
+			elem.style.left = `${left}px`;
+			elem.style.top = `${top}px`;
+		}
+
 		e.preventDefault();
 	}
-/* --- */
+	/* --- */
 
-/* --- Window methods ---*/
+	/* --- Window methods ---*/
+	/* NOTE PROBABLY NOT NEEDED -- Opt for native F11 fullscreen. */
+	/*
 	function fullScreen(){
 		let elem = document.querySelector('main');
 		if(!bFullScreen){
@@ -104,6 +137,7 @@
 			bFullScreen = false;
 		}
 	}
+	*/
 
 	function breakWindow(){
 		let width = window.innerWidth;
@@ -114,7 +148,14 @@
 	function closeWindow(){
 		window.close();
 	}
-/* --- */
+	/* --- */
+
+	function handleMessage(e){
+		elem = e.detail.el;
+		
+		elemStartPos.x = parseInt(elem.style.left);
+		elemStartPos.y = parseInt(elem.style.top);
+	}
 
 </script>
 
@@ -128,7 +169,7 @@
 		<div class="container" on:dragover="{allowDrop}" on:drop="{drop}">
 			<div class="innerContainer">
 				{#each aNodes as {name, x, y}}
-					<Node nodeTitle={name} pos={{x, y}} />
+					<Node on:message="{handleMessage}" nodeTitle={name} pos={{x, y}} />
 				{/each}
 			</div>
 		</div>

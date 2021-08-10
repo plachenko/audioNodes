@@ -20,7 +20,7 @@
             {/each}
         {:else if sType == 'window'}
             {#each aProps as {name, method}, i}
-            <li class="{(!window.opener && i == 2) ? 'hide' : ''}"
+            <li class="{(!window.opener && i == 1) ? 'hide' : ''}"
                 on:mousedown={method}>
                 {name}
             </li>

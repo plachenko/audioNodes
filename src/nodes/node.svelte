@@ -1,11 +1,13 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
+
 
     export let nodeTitle;
     export let pos;
 
+    const dispatch = createEventDispatcher();
     let node;
-
     let title = "";
 
     onMount(()=>{
@@ -28,25 +30,49 @@
     })
 
     function dragStart(e){
-		e.preventDefault();
-        console.log('starting!',e);
-        e.dataTransfer.setData('node', true);
-		this.style.opacity = "0.4";
+		console.log('starting!',e.path[1]);
+        dispatch('message', {
+            el: node
+        });
+		e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+        // let el = JSON.stringify(node);
+        // console.log(node);
+        // e.dataTransfer.setData('node', el);
+		// e.preventDefault();
+        // this.style.opacity = "0.4";
 	}
+
+    function dragSocketStart(e){
+		e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+    }
 
 	function dragEnd(e){
         e.preventDefault();
-		console.log(e);
+		// console.log(e);
 		this.style.opacity = "1";
 	}
 
     function drag(e){
         // e.preventDefault();
-        console.log(e);
+        // console.log(e);
 		e.dataTransfer.setDragImage(new Image(), 0, 0);
 	}
 
     function getProps(obj){
+        // console.log('adding');
+        let actx = new AudioContext();
+        // console.log(actx);
+        // let iObj = actx[obj];
+        // console.log(iObj())
+        // console.log(Object.getPrototypeOf(iObj))
+        /*
+        for(let prop of iObj.__proto__){
+            console.log(prop);
+        }
+        */
+        // console.log(actx, iObj)
         // console.log(Object(actx[nodeTitle]).entries())
 
         // let 
@@ -62,7 +88,7 @@
     <span class="head" 
         draggable="true" 
         on:dragend="{dragEnd}" 
-        on:dragstart="{drag}" 
+        on:dragstart="{dragStart}" 
         >
         { title }
     </span>
@@ -83,7 +109,7 @@
                 <li 
                     draggable="true" 
                     on:dragend="{dragEnd}" 
-                    on:dragstart="{dragStart}"
+                    on:dragstart="{dragSocketStart}"
                     on:drag="{drag}"
                     >
                     output
