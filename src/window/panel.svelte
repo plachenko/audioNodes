@@ -2,6 +2,7 @@
 	import { onMount }  from 'svelte';
 	import Menu from './menu.svelte';
 	import Node from '../nodes/node.svelte';
+	
 	let aWindowProps = [
 		{name: 'break window', method: breakWindow},
 		// {name: 'fullscreen', method: fullScreen},
@@ -43,7 +44,6 @@
 			if(e.button == 0){
 				startPos.x = e.offsetX;
 				startPos.y = e.offsetY;
-				console.log(startPos)
 				/*
 				if(!elem){
 					select.start = true;
@@ -167,7 +167,7 @@
 
 	function handleNodeMove(e){
 		elem = e.detail.el;
-		console.log(elem);
+		// console.log(elem);
 
 		elemStartPos.x = parseInt(elem.style.left);
 		elemStartPos.y = parseInt(elem.style.top);

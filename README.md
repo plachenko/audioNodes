@@ -1,4 +1,6 @@
-*Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
+Audio Nodes is an HTML5 Javascript application to create sound through a node based digital instrument. 
+
+It is built on top of [Svelte](https://svelte.dev). I have left the default templated README for anyone who wants to understand the basics on how the app is built. 
 
 ---
 
