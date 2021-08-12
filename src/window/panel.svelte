@@ -5,7 +5,6 @@
 	
 	let aWindowProps = [
 		{name: 'break window', method: breakWindow},
-		// {name: 'fullscreen', method: fullScreen},
 		{name: 'close window', method: closeWindow}
 	];
 	let bFullScreen = false;
@@ -131,20 +130,6 @@
 	/* --- */
 
 	/* --- Window methods ---*/
-	/* NOTE PROBABLY NOT NEEDED -- Opt for native F11 fullscreen. */
-	/*
-	function fullScreen(){
-		let elem = document.querySelector('main');
-		if(!bFullScreen){
-			elem.requestFullscreen();
-			bFullScreen = true;
-		}else {
-			document.exitFullscreen();
-			bFullScreen = false;
-		}
-	}
-	*/
-
 	function breakWindow(){
 		let width = window.innerWidth;
 		let height = window.innerHeight;
