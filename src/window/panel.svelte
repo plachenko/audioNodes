@@ -10,7 +10,7 @@
 	];
 	let bFullScreen = false;
 	let aNodes = [
-		{name: 'createMediaElementSource', x: 0, y: 0, center: false},
+		{name: 'createMediaElementSource', x: 100, y: 100, center: false},
 		// {name: 'createMediaElementSource', x: 600, y: 300},
 	];
 	let aObjectProps = [];
@@ -23,10 +23,6 @@
 	let elem = null;
 	let container;
 	let startPos = {
-		x: 0,
-		y: 0
-	};
-	let elemStartPos = {
 		x: 0,
 		y: 0
 	};
@@ -95,7 +91,7 @@
 	function drop(e){
 
 		let data = e.dataTransfer.getData('nodeName');
-		console.log(e);
+
 		if(data){
 			aNodes = [...aNodes, {
 				name: data, 
@@ -112,13 +108,8 @@
 
 	function dragOver(e){
 
-		let left = (e.offsetX - startPos.x);
-		let top = (e.offsetY - startPos.y);
-		// let top = parseInt(elem.style.top) + (e.offsetY - startPos.y);
-		// let left = ;
-			// left += (e.movementX/1.00000001);
-		// let top = parseInt(elem.style.top);
-			// top += (e.movementY/1.00000001);
+		let left = e.offsetX - startPos.x;
+		let top = e.offsetY - startPos.y;
 
 		if(select.start){
 			console.log(e);
@@ -167,10 +158,6 @@
 
 	function handleNodeMove(e){
 		elem = e.detail.el;
-		// console.log(elem);
-
-		elemStartPos.x = parseInt(elem.style.left);
-		elemStartPos.y = parseInt(elem.style.top);
 	}
 
 	function handleNodeSocket(e){
