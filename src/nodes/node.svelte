@@ -5,10 +5,21 @@
 
     export let nodeTitle;
     export let pos;
+    export let center = false;
 
     const dispatch = createEventDispatcher();
     let node;
     let title = "";
+
+    let socketPos = {
+        x: 0,
+        y: 0
+    }
+
+    let offset = {
+        x: 0,
+        y: 0
+    }
 
     onMount(()=>{
         if(nodeTitle.includes('create')){
@@ -25,16 +36,35 @@
             h: node.offsetHeight
         };
 
-        node.style.left = `${pos.x - (dim.w/2)}px`;
-        node.style.top = `${pos.y - (dim.h/2)}px`;
+        if(center){
+            offset.x = dim.w / 2;
+            offset.y = dim.h / 2;
+        }
+
+        node.style.left = `${pos.x - offset.x}px`;
+        node.style.top = `${pos.y - offset.y}px`;
+
+        // node.style.left = `${pos.x - (dim.w/2)}px`;
+        // node.style.top = `${pos.y - (dim.h/2)}px`;
     })
 
     function dragStart(e){
-		console.log('starting!',e.path[1]);
-        dispatch('message', {
+        // console.log(node);
+        // console.log(e.offsetX - e.path[1].style.left);
+        let elm = e.path[1];
+        let pos = {
+            x: parseInt(elm.style.left),
+            y: parseInt(elm.style.top),
+        };
+
+        // console.log(e, pos);
+		// console.log('starting!',e.path[1]);
+
+        dispatch('nodeMove', {
             el: node
         });
-		e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+		// e.dataTransfer.setDragImage(new Image(), 0, 0);
 
         // let el = JSON.stringify(node);
         // console.log(node);
@@ -44,8 +74,15 @@
 	}
 
     function dragSocketStart(e){
-		e.dataTransfer.setDragImage(new Image(), 0, 0);
+        dispatch('nodeSocket', {
+            el: node
+        });
+        socketPos.x = e.offsetX;
+        socketPos.y = e.offsetY;
 
+        // console.log(socketPos);
+
+		// e.dataTransfer.setDragImage(new Image(), 0, 0);
     }
 
 	function dragEnd(e){
@@ -57,8 +94,20 @@
     function drag(e){
         // e.preventDefault();
         // console.log(e);
-		e.dataTransfer.setDragImage(new Image(), 0, 0);
+		// e.dataTransfer.setDragImage(new Image(), 0, 0);
 	}
+
+    function dragSocket(e){
+        let nodeLine = document.querySelector('.nodeLines');
+        let stop = e.offsetY - socketPos.y;
+        let sleft =  e.offsetX - socketPos.x;
+
+        // nodeLine.style.width = `${sleft}px`;
+        // nodeLine.style.left = `60px`;
+        // nodeLine.style.height =  `${stop}px`;
+        // nodeLine.style.top = `calc(50% - ${stop}px)`
+        // nodeLine.style.top = `0px`;
+    }
 
     function getProps(obj){
         // console.log('adding');
@@ -88,29 +137,30 @@
     <span class="head" 
         draggable="true" 
         on:dragend="{dragEnd}" 
-        on:dragstart="{dragStart}" 
+        on:pointerdown="{dragStart}"
         >
         { title }
     </span>
+    <div on:pointerdown="{dragStart}" style="box-sizing: border-box; width: 100%; height: 100%; top: 0px; position: absolute;"></div>
         
     <div class="sockets">
         <ul class="input">
             <li 
                 draggable="true" 
                 on:dragend="{dragEnd}" 
-                on:dragstart="{dragStart}"
+                on:dragstart="{dragSocketStart}"
                 on:drag="{drag}"
                 >
                 input
             </li>
         </ul>
         <ul class="output">
-            {#each Array(3) as _}
+            {#each Array(1) as _}
                 <li 
                     draggable="true" 
                     on:dragend="{dragEnd}" 
                     on:dragstart="{dragSocketStart}"
-                    on:drag="{drag}"
+                    on:drag="{dragSocket}"
                     >
                     output
                     <div class="nodeLines">
@@ -123,23 +173,28 @@
 </div>
 
 <style>
-    .nodeLines{
-		width: 100px;
-		position: absolute;
-        right:-100px;
-        top:50%;
-		border-bottom: 2px solid;
-        border-right: 2px solid;
-	    }
-    .head{
-        cursor: move;
-        background-color:#CCC;
-        padding: 5px 0px;
-        text-align: center;
-        width: 100%;
-        display:block;
-        border-radius: 10px 10px 0px 0px;
-        }
+
+.nodeLines{
+    width: 100px;
+    position: absolute;
+    right:-100px;
+    top: calc(50% + 1px);
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+    z-index: 0;
+    /* border-top: 2px solid; */
+    /* background-color:#F00; */
+    }
+
+.head{
+    cursor: move;
+    background-color:#CCC;
+    padding: 5px 0px;
+    text-align: center;
+    width: 100%;
+    display:block;
+    border-radius: 10px 10px 0px 0px;
+    }
 
 .node{
     left: 100px;
@@ -153,6 +208,7 @@
     box-sizing: border-box;
     flex: 1;
     user-select: none;
+    cursor: move;
     }
     .node:hover{
         box-shadow: 0px 0px 4px #000;
@@ -180,7 +236,7 @@
 		            }
                 .sockets li:hover::before,
                 .sockets li:hover::after{
-                    box-shadow: 0px 2px 5px #000;
+                    box-shadow: 0px 0px 5px #000;
                     }
 
         .input li::before,

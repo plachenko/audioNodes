@@ -9,18 +9,26 @@
 	];
 	let bFullScreen = false;
 	let aNodes = [
-		{name: 'createMediaElementSource', x: 200, y: 200},
+		{name: 'createMediaElementSource', x: 0, y: 0, center: false},
 		// {name: 'createMediaElementSource', x: 600, y: 300},
 	];
 	let aObjectProps = [];
 	let bPanning = false;
+	let select = {
+		start: false,
+		points: []
+	}
 
-	let elem;
+	let elem = null;
+	let container;
+	let startPos = {
+		x: 0,
+		y: 0
+	};
 	let elemStartPos = {
 		x: 0,
 		y: 0
 	};
-
 
 	for(let prop in AudioContext.prototype){
 		aObjectProps.push(prop);
@@ -31,30 +39,36 @@
 		let xamt = 0;
 		let yamt = 0;
 
-		/*
-		document.getElementById('container').addEventListener('mousedown', (e)=>{
+		container.addEventListener('pointerdown', (e)=>{
 			if(e.button == 0){
-				console.log('test')
+				startPos.x = e.offsetX;
+				startPos.y = e.offsetY;
+				console.log(startPos)
+				/*
+				if(!elem){
+					select.start = true;
+				}
+				*/
 			}
 			if(e.button == 1){
 				bPanning = true;
 			}
 		});
 
-		document.getElementById('container').addEventListener('mousemove', (e)=>{
+		container.addEventListener('mousemove', (e)=>{
 			if(bPanning){
 				xamt += e.movementX;
 				yamt += e.movementY;
 				pan(xamt, yamt);
 			}
 		});
-		document.getElementById('container').addEventListener('mouseup', (e)=>{
+		container.addEventListener('mouseup', (e)=>{
 			if(bPanning){
 				bPanning = false;
 			}
 		});
 
-		document.getElementById('container').addEventListener('wheel', (e)=>{
+		container.addEventListener('wheel', (e)=>{
 			if(iScrollAmt > 0){
 				iScrollAmt -= (e.deltaY/1000);
 			}else{
@@ -62,65 +76,66 @@
 			}
 			zoom(iScrollAmt);
 		});
-		*/
-
 	});
 	
 
 		
 	function pan(x, y){
-		let nodes = document.getElementById('innerContainer');
+		let nodes = container;
 			nodes.style.transform = "translate("+x+"px, "+y+"px)";
 	}
 
 	function zoom(iScrollAmt){
-		let nodes = document.getElementById('innerContainer');
+		let nodes = container;
 			nodes.style.transformOrigin = (nodes.offsetWidth/2) + "px "+ ((nodes.offsetHeight/2) + window.innerHeight/2) + "px";
 			nodes.style.transform = "scale("+iScrollAmt+")";
 	}
 
 	/* --- Drag and Drop functionality --- */
 	function drop(e){
-		// console.log('dropping', e.dataTransfer.getData('node'));
-		// let el = JSON.parse(e.dataTransfer.getData('node'));
-		// console.log(el);
 
 		let data = e.dataTransfer.getData('nodeName');
+		console.log(e);
 		if(data){
 			aNodes = [...aNodes, {
 				name: data, 
 				x: e.layerX, 
-				y: e.layerY
+				y: e.layerY,
+				center: true
 			}];
 		}
 
-		// console.log(elem);
-		// elem.style.left = `${e.clientX}px`;
-		// elem.style.top = `${e.clientY}px`;
-		// console.log(elem.offsetWidth);
 		elem = null;
 
 		e.preventDefault();
 	}
 
-	function allowDrop(e){
-		// console.log(window.getComputedStyle(elem).left)
-		// console.log(elemStartPos);
+	function dragOver(e){
 
-		// let left = e.clientX;
-		let left = e.x;
-			left -= 298;
-			// left -= 50;
-		let top = e.clientY;
-			// top -= - 53;
-			top -= 50;
+		let left = (e.offsetX - startPos.x);
+		let top = (e.offsetY - startPos.y);
+		// let top = parseInt(elem.style.top) + (e.offsetY - startPos.y);
+		// let left = ;
+			// left += (e.movementX/1.00000001);
+		// let top = parseInt(elem.style.top);
+			// top += (e.movementY/1.00000001);
+
+		if(select.start){
+			console.log(e);
+		}
 
 		if(elem){
 			elem.style.left = `${left}px`;
 			elem.style.top = `${top}px`;
 		}
-
+		
 		e.preventDefault();
+	}
+
+	function dragCancel(){
+		elem = null;
+		select.start = false;
+		select.points = [];
 	}
 	/* --- */
 
@@ -150,11 +165,20 @@
 	}
 	/* --- */
 
-	function handleMessage(e){
+	function handleNodeMove(e){
 		elem = e.detail.el;
-		
+		console.log(elem);
+
 		elemStartPos.x = parseInt(elem.style.left);
 		elemStartPos.y = parseInt(elem.style.top);
+	}
+
+	function handleNodeSocket(e){
+		// console.log('test')
+	}
+
+	function testDrag(e){
+		// console.log('dragEvt', e);
 	}
 
 </script>
@@ -166,10 +190,16 @@
 	<div class="mid">
 		<Menu sType='pallet' aProps={aObjectProps} />
         
-		<div class="container" on:dragover="{allowDrop}" on:drop="{drop}">
-			<div class="innerContainer">
-				{#each aNodes as {name, x, y}}
-					<Node on:message="{handleMessage}" nodeTitle={name} pos={{x, y}} />
+		<div class="container" on:drop="{drop}">
+			<div class="{(elem) ? 'eventContainer' : ''}" on:pointermove="{dragOver}" on:pointerup="{dragCancel}" />
+			<div  bind:this={container} class="innerContainer">
+				{#each aNodes as {name, x, y, center}}
+					<Node 
+						on:nodeSocket="{handleNodeSocket}"
+						on:nodeMove="{handleNodeMove}"
+						center={center}
+						nodeTitle={name} 
+						pos={{x, y}} />
 				{/each}
 			</div>
 		</div>
@@ -191,6 +221,16 @@
 	/* width: 100%; */
 	/* resize: horizontal; */
 }
+
+.eventContainer{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	/* background-color:#F00; */
+	}
 
 .container{
 	position: relative;
@@ -217,4 +257,8 @@
 		height: calc(100% - 32px);
 		}
 
+.innerContainer{
+	width: 100%;
+	height: 100%;
+}
 </style>
