@@ -7,7 +7,6 @@
 		{name: 'break window', method: breakWindow},
 		{name: 'close window', method: closeWindow}
 	];
-	let bFullScreen = false;
 	let aNodes = [
 		{name: 'createMediaElementSource', x: 100, y: 100, center: false},
 		// {name: 'createMediaElementSource', x: 600, y: 300},
