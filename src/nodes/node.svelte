@@ -49,16 +49,11 @@
     })
 
     function dragStart(e){
-        // console.log(node);
-        // console.log(e.offsetX - e.path[1].style.left);
         let elm = e.path[1];
         let pos = {
             x: parseInt(elm.style.left),
             y: parseInt(elm.style.top),
         };
-
-        // console.log(e, pos);
-		// console.log('starting!',e.path[1]);
 
         dispatch('nodeMove', {
             el: node
@@ -153,6 +148,9 @@
                 >
                 input
             </li>
+            <div class="nodeLines">
+
+            </div>
         </ul>
         <ul class="output">
             {#each Array(1) as _}
@@ -175,16 +173,21 @@
 <style>
 
 .nodeLines{
-    width: 100px;
+    z-index: 0;
+    width: 10px;
     position: absolute;
-    right:-100px;
     top: calc(50% + 1px);
     border-bottom: 2px solid;
-    border-right: 2px solid;
-    z-index: 0;
-    /* border-top: 2px solid; */
-    /* background-color:#F00; */
+    background-color:#F00;
     }
+    .output .nodeLines{
+        top: calc(50%);
+        right: -20px;
+        }
+    .input .nodeLines{
+        top: calc(50% + 3px);
+        left: -23px;
+        }
 
 .head{
     cursor: move;

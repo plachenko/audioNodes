@@ -23,13 +23,17 @@
 </script>
 
 <main id="main" on:drop="{drop}" on:dragover="{dragger}">
-	<Panel />
+	<div style="flex:1; flex-direction: row; display: flex; height: 50%; box-sizing: border-box; border-bottom: 2px solid;">
+		<Panel />
+		<Panel />
+	</div>
+	<Panel type={1} />
 </main>
 
 <style>
 
 main {
-	flex-direction: row;
+	flex-direction: column;
 	display: flex;
 	flex: 1;
 	height: 100%;
