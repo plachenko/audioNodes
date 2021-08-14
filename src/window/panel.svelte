@@ -2,6 +2,7 @@
 	import { onMount }  from 'svelte';
 	import Menu from './menu.svelte';
 	import Node from '../nodes/node.svelte';
+    import { createEventDispatcher } from 'svelte';
 	
 	export let size = 0;
 	
